@@ -1,0 +1,12 @@
+%% -*- erlang -*-
+
+{application, ejsv,
+ [
+  {description, "Erlang Json Schema Validator"},
+  {vsn, "1.0.0"},
+  {registered, []},
+  {modules, []},
+  {applications, [kernel, stdlib]},
+  {mod, {ejsv_appsup, []}},
+  {env, []}
+ ]}.
