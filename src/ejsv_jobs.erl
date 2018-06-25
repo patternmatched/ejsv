@@ -1,15 +1,14 @@
--module(ejsv_checks).
+-module(ejsv_jobs).
 -include("ejsv.hrl").
--export([ validate/2 ]).
 -compile(export_all).
 
 % XXX checks should be as efficient as possible
 % if possible do work in rules
 % can break up a checks to take advantage of parallel execution
 
-validate(_Json, #schema{ rules = [] }) ->
+execute(_Json, #schema{ rules = [] }) ->
   true;
-validate(Json, Schema) when is_record(Schema, schema) ->
+execute(Json, Schema) when is_record(Schema, schema) ->
   ct:pal("CT:VALIDATE ~p ~p~n", [Json, Schema#schema.rules]),
   % TODO run checks in parallel
   case lists:foldl(fun run_check/2, {Json, []}, Schema#schema.rules) of
@@ -46,7 +45,7 @@ check_prop(Key, Schema, {V, Errors}) ->
   case maps:get(Key, V, undefined) of
     undefined -> {V, Errors};
     Prop ->
-      case validate(Prop, Schema) of
+      case execute(Prop, Schema) of
         true -> {V, Errors};
         {false, MoreErrors} ->
           ct:pal("CT:ERRORS ~p ~p~n", [Errors, MoreErrors]),
@@ -215,7 +214,7 @@ check_type(V, #schema{} = S) -> check_schema(V, S);
 check_type(_V, _Type)        -> false.
 
 check_schema(V, Schema) ->
-  case validate(V, Schema) of
+  case execute(V, Schema) of
     true -> true;
     {false,_} -> false
   end.

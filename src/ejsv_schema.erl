@@ -7,7 +7,7 @@ compile(JsonMap, Opts) when is_map(JsonMap) ->
   SchemaType = maps:get(schema, Opts, json_schema),
   SchemaVersion = maps:get(version, Opts, {3,0}),
   % TODO JsonPathed = ejsv_utils:add_path(JsonMap, "/"),
-  % pronably in ejsv_checks:validate/2
+  % probably in ejsv_jobs:process/2
   SchemaTag = {SchemaType, SchemaVersion},
   Rules = ejsv_rules:for_schema(SchemaTag),
   ReduceRule = fun(Rule) -> reduce_rules(SchemaTag, JsonMap, Rule) end,

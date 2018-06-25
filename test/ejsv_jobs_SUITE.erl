@@ -1,9 +1,9 @@
--module(ejsv_checks_SUITE).
+-module(ejsv_jobs_SUITE).
 -include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
 -compile(export_all).
 
--define(mod, ejsv_checks).
+-define(mod, ejsv_jobs).
 
 all() -> ejsv_testhelper:all(?MODULE).
 
