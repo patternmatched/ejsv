@@ -23,6 +23,16 @@ for_schema({json_schema, {3,_}}) ->
    maximum,
    minimum
   ];
+for_schema({json_schema, {4,_}}) ->
+  [
+   min_items,
+   max_items,
+   min_length,
+   max_length,
+   unique_items,
+   maximum,
+   minimum
+  ];
 for_schema({open_api, _}) ->
   [
    properties
