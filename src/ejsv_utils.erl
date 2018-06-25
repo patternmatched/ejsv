@@ -63,3 +63,24 @@ remove_dups([]) ->
 remove_dups([H|T]) ->
   [H | [X || X <- remove_dups(T), X /= H]].
 
+merge_lists(Parent,Child) ->
+  Combined = Parent ++ Child,
+  Fun = fun(Key) ->
+            [Value|_] = proplists:get_all_values(Key,Combined),
+            {Key,Value}
+        end,
+  lists:map(Fun,proplists:get_keys(Combined)).
+
+combine_lists(Parent,Child) ->
+  Combined = Parent ++ Child,
+  Fun = fun(Key) ->
+            case proplists:get_all_values(Key,Combined) of
+              [L1, L2] when is_list(L1), is_list(L2) -> {Key,L1 ++ L2};
+              [L1, V2] when is_list(L1) -> {Key,L1 ++ [V2]};
+              [V1, L2] when is_list(L2) -> {Key,[V1|L2]};
+              [V1, V2] -> {Key, [V1, V2]};
+              [V] -> {Key, V};
+              Vs -> throw({additional_values_found, Key, Vs})
+            end
+        end,
+  lists:map(Fun,proplists:get_keys(Combined)).

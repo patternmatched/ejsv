@@ -31,3 +31,8 @@ SchemaFilename = "./user-schema.json",
 JsonMap = #{ field => "value" },
 true = ejsv:validate(SchemaFilename, JsonMap).
 ```
+
+# Contribution
+
+Validate swagger spec itself using [Swagger Spec Test Suite](https://github.com/Yelp/swagger_spec_validator).
+Validate json schema rules using [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite.git).

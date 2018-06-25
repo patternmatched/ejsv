@@ -5,8 +5,7 @@
 
 run_schema_tests(Rule, Config) ->
   DataDir = proplists:get_value(data_dir, Config),
-  TestDir = proplists:get_value(test_dir, Config),
-  TestFile = filename:join([DataDir,TestDir,Rule++".json"]),
+  TestFile = filename:join([DataDir,Rule++".json"]),
   {ok,Bin} = file:read_file(TestFile),
   Tests = jiffy:decode(Bin, [return_maps]),
   lists:foreach(fun(Test) -> run_schema_test(Test, Config) end, Tests).
