@@ -1,5 +1,5 @@
 -record(schema, { id,
-                  rules,
+                  keywords,
                   transform,
                   type,
                   version }).

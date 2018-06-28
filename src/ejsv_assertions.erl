@@ -1,36 +1,36 @@
--module(ejsv_jobs).
+-module(ejsv_assertions).
 -include("ejsv.hrl").
 -compile(export_all).
 
 % XXX checks should be as efficient as possible
-% if possible do work in rules
+% if possible do work in keywords module
 % can break up a checks to take advantage of parallel execution
 
 -record(job, { errors = [],
                data }).
 
-execute(_Json, #schema{ rules = [] }) ->
+execute(_Json, #schema{ keywords = [] }) ->
   true;
 execute(Json, Schema) when is_record(Schema, schema) ->
   case
     % TODO run jobs in parallel
     lists:foldl(fun run_job/2,
                 #job{ data = Json },
-                Schema#schema.rules)
+                Schema#schema.keywords)
   of
     #job{ errors = [] } -> true;
     #job{ errors = Errors } -> {false, Errors}
   end.
 
-run_job({Job, Opts}, #job{ data = Json } = St) ->
-  Detail = #{ rule => Job,
+run_job({Keyword, Opts}, #job{ data = Json } = St) ->
+  Detail = #{ keyword => Keyword,
               value => Json,
               props => Opts },
-  case ?MODULE:Job(Json, Opts) of
+  case ?MODULE:Keyword(Json, Opts) of
     true ->
       St;
     false ->
-      Error = Detail#{ message => ?MODULE:Job(error) },
+      Error = Detail#{ message => ?MODULE:Keyword(error) },
       St#job{ errors = [Error|St#job.errors] };
     {false, Msg} ->
       Error = Detail#{ message => Msg },
@@ -49,7 +49,7 @@ properties(V, #{ properties := PropSchemas }) ->
     {V, Errors} -> {false, Errors}
   end.
 
-% XXX perhaps some of this should be done in rules?
+% XXX perhaps some of this should be done in keywords?
 check_prop(Key, Schema, {V, Errors}) ->
   case maps:get(Key, V, undefined) of
     undefined -> {V, Errors};

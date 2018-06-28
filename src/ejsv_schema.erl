@@ -7,17 +7,17 @@ compile(JsonMap, Opts) when is_map(JsonMap) ->
   SchemaType = maps:get(schema, Opts, json_schema),
   SchemaVersion = maps:get(version, Opts, {3,0}),
   % TODO JsonPathed = ejsv_utils:add_path(JsonMap, "/"),
-  % probably in ejsv_jobs:process/2
+  % probably in ejsv_assertions:execute/2
   SchemaTag = {SchemaType, SchemaVersion},
-  Rules = ejsv_rules:for_schema(SchemaTag),
+  Keywords = ejsv_keywords:for_schema(SchemaTag),
   Transform = ejsv_transform:for_schema(SchemaTag, JsonMap),
-  ReduceRule = fun(Rule) -> reduce_rules(SchemaTag, JsonMap, Rule) end,
-  SchemaRules = lists:concat(lists:map(ReduceRule, Rules)),
+  ReduceKeyword = fun(Keyword) -> reduce_keywords(SchemaTag, JsonMap, Keyword) end,
+  SchemaKeywords = lists:concat(lists:map(ReduceKeyword, Keywords)),
   {ok, #schema{ type = SchemaType,
                 version = SchemaVersion,
                 transform = Transform,
-                rules = SchemaRules }}.
+                keywords = SchemaKeywords }}.
 
-reduce_rules(Version, Schema, Rule) ->
-  RuleS = ejsv_rules:rule(Version, Rule, Schema),
-  lists:flatten([RuleS]).
+reduce_keywords(Version, Schema, Keyword) ->
+  Keywords = ejsv_keywords:define(Version, Keyword, Schema),
+  lists:flatten([Keywords]).

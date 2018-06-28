@@ -12,7 +12,7 @@ validate_test(Config) ->
   SchemaFile = filename:join([DataDir,"schema.json"]),
   ValidFile = filename:join([DataDir,"valid.json"]),
   InvalidFile = filename:join([DataDir,"invalid.json"]),
-  Error = #{ rule => maximum,
+  Error = #{ keyword => maximum,
              value => 4,
              props => #{ maximum => 3, exclusive => false },
              message => "value is greater than maximum" },

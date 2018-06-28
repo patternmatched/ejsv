@@ -8,7 +8,7 @@ validate(Ref, Json) ->
 
 validate(Ref, Json, Opts) ->
   case resolve(Ref, Opts) of
-    {ok, Schema} -> ejsv_jobs:execute(Json, Schema);
+    {ok, Schema} -> ejsv_assertions:execute(Json, Schema);
     {error, _} = Error -> Error
   end.
 

@@ -18,7 +18,7 @@
 % TODO allOf, anyOf, oneOf
 
 for_schema(SchemaTag, Schema) when is_map(Schema) ->
-  Rules = get_rules(SchemaTag, Schema),
+  Rules = extract(SchemaTag, Schema),
   ct:pal("~p~n", [Rules]),
   fun(Json) -> transform(Json, Rules) end.
 
@@ -26,42 +26,42 @@ for_schema(SchemaTag, Schema) when is_map(Schema) ->
 % https://github.com/OAI/OpenAPI-Specification/blob/OpenAPI.next/versions/3.0.0.md#dataTypes
 % https://spacetelescope.github.io/understanding-json-schema/reference/type.html
 
-get_rules(_SchemaTag, #{ <<"type">> := <<"boolean">> }) ->
+extract(_SchemaTag, #{ <<"type">> := <<"boolean">> }) ->
   #value{ type = boolean };
-get_rules(_SchemaTag, #{ <<"type">> := <<"string">> } = Schema) ->
+extract(_SchemaTag, #{ <<"type">> := <<"string">> } = Schema) ->
   Format = maps:get(<<"format">>, Schema, undefined),
   #value{ type = string, format = maybe_binary_to_list(Format) };
-get_rules(_SchemaTag, #{ <<"type">> := <<"date">> }) ->
+extract(_SchemaTag, #{ <<"type">> := <<"date">> }) ->
   #value{ type = string, format = "date" };
-get_rules(_SchemaTag, #{ <<"type">> := <<"date-time">> }) ->
+extract(_SchemaTag, #{ <<"type">> := <<"date-time">> }) ->
   #value{ type = string, format = "date-time" };
-get_rules(_SchemaTag, #{ <<"type">> := <<"integer">> }) ->
+extract(_SchemaTag, #{ <<"type">> := <<"integer">> }) ->
   #value{ type = integer };
-get_rules(_SchemaTag, #{ <<"type">> := <<"number">> }) ->
+extract(_SchemaTag, #{ <<"type">> := <<"number">> }) ->
   #value{ type = integer };
-get_rules(SchemaTag, #{ <<"type">> := <<"object">> } = Schema) ->
+extract(SchemaTag, #{ <<"type">> := <<"object">> } = Schema) ->
   Properties = maps:get(<<"properties">>, Schema, #{}),
   Props = maps:map(fun(Prop, PropSchema) ->
-                       Rules = get_rules(SchemaTag, PropSchema),
+                       Rules = extract(SchemaTag, PropSchema),
                        set_name(Prop, Rules)
                    end, Properties),
   #object{ properties = Props };
-get_rules(SchemaTag, #{ <<"properties">> := _ } = Schema) ->
-  get_rules(SchemaTag, Schema#{ <<"type">> => <<"object">> });
-get_rules(SchemaTag, #{ <<"type">> := <<"array">> } = Schema) ->
+extract(SchemaTag, #{ <<"properties">> := _ } = Schema) ->
+  extract(SchemaTag, Schema#{ <<"type">> => <<"object">> });
+extract(SchemaTag, #{ <<"type">> := <<"array">> } = Schema) ->
   case maps:get(<<"items">>, Schema, undefined) of
     ItemSchema when is_map(ItemSchema) ->
-      Type = get_rules(SchemaTag, ItemSchema),
+      Type = extract(SchemaTag, ItemSchema),
       #list{ type = Type };
     ItemSchemas when is_list(ItemSchemas) ->
-      Types = lists:map(fun(ItemSchema) -> get_rules(SchemaTag, ItemSchema) end, ItemSchemas),
+      Types = lists:map(fun(ItemSchema) -> extract(SchemaTag, ItemSchema) end, ItemSchemas),
       AddItem = maps:get(<<"additionalItems">>, Schema, #{}),
-      Type = get_rules(SchemaTag, AddItem),
+      Type = extract(SchemaTag, AddItem),
       #list{ types = Types, other_type = Type };
     undefined ->
       undefined
   end;
-get_rules(_SchemaTag, _Schema) ->
+extract(_SchemaTag, _Schema) ->
   undefined.
 
 set_name(Name, #value{} = Rule) -> Rule#value{ name = Name };
