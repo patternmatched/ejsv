@@ -6,39 +6,6 @@
 % if possible do work in keywords module
 % can break up a checks to take advantage of parallel execution
 
--record(job, { errors = [],
-               data }).
-
-execute(_Json, #schema{ keywords = [] }) ->
-  true;
-execute(Json, Schema) when is_record(Schema, schema) ->
-  case
-    % TODO run jobs in parallel
-    lists:foldl(fun run_job/2,
-                #job{ data = Json },
-                Schema#schema.keywords)
-  of
-    #job{ errors = [] } -> true;
-    #job{ errors = Errors } -> {false, Errors}
-  end.
-
-run_job({Keyword, Opts}, #job{ data = Json } = St) ->
-  Detail = #{ keyword => Keyword,
-              value => Json,
-              props => Opts },
-  case ?MODULE:Keyword(Json, Opts) of
-    true ->
-      St;
-    false ->
-      Error = Detail#{ message => ?MODULE:Keyword(error) },
-      St#job{ errors = [Error|St#job.errors] };
-    {false, Msg} ->
-      Error = Detail#{ message => Msg },
-      St#job{ errors = [Error|St#job.errors] }
-  end.
-
-%% --
-
 properties(V, _Opts) when not is_map(V) ->
   true;
 properties(V, #{ properties := PropSchemas }) ->
@@ -54,10 +21,9 @@ check_prop(Key, Schema, {V, Errors}) ->
   case maps:get(Key, V, undefined) of
     undefined -> {V, Errors};
     Prop ->
-      case execute(Prop, Schema) of
+      case ejsv_schema:assert(Prop, Schema) of
         true -> {V, Errors};
         {false, MoreErrors} ->
-          ct:pal("CT:ERRORS ~p ~p~n", [Errors, MoreErrors]),
           {V, Errors ++ MoreErrors}
       end
   end.
@@ -223,7 +189,7 @@ check_type(V, #schema{} = S) -> check_schema(V, S);
 check_type(_V, _Type)        -> false.
 
 check_schema(V, Schema) ->
-  case execute(V, Schema) of
+  case ejsv_schema:assert(V, Schema) of
     true -> true;
     {false,_} -> false
   end.

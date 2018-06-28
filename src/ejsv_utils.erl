@@ -106,3 +106,8 @@ maybe_binary_to_list(undefined) ->
   undefined;
 maybe_binary_to_list(Bin) when is_binary(Bin) ->
   binary_to_list(Bin).
+
+binary_keys_to_list(Map) when is_map(Map) ->
+  maps:fold(fun(K, V, A) when is_binary(K) ->
+                maps:put(binary_to_list(K), V, A)
+            end, #{}, Map).

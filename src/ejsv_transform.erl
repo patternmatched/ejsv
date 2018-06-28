@@ -19,7 +19,6 @@
 
 for_schema(SchemaTag, Schema) when is_map(Schema) ->
   Rules = extract(SchemaTag, Schema),
-  ct:pal("~p~n", [Rules]),
   fun(Json) -> transform(Json, Rules) end.
 
 % primitive types
@@ -88,10 +87,14 @@ transform(Value, #value{ type = string, format = "date-time" }) ->
     _:_ -> Value
   end;
 transform(Value, #value{ type = string }) ->
-  binary_to_list(Value);
+  try
+    binary_to_list(Value)
+  catch
+    _:_ -> Value
+  end;
 transform(Value, #value{ type = _Type }) ->
   Value;
-transform(Value, #object{ properties = Props }) ->
+transform(Value, #object{ properties = Props }) when is_map(Value) ->
   maps:fold(fun(Prop, V, Acc) ->
                 case maps:get(Prop, Props, undefined) of
                   undefined -> Acc;
@@ -111,5 +114,5 @@ transform(Value, #list{ types = Types, other_type = OtherType }) ->
   Adds = [ transform(lists:nth(Idx, Value), OtherType)
            || Idx <- lists:seq(Split + 1, length(Value)) ],
   Tuple ++ Adds;
-transform(Value, undefined) ->
+transform(Value, _Untransformable) ->
   Value.
