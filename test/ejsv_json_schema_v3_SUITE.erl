@@ -18,6 +18,9 @@ init_per_testcase(_Case, Config) ->
   ok = ejsv_cache:install(),
   Config.
 
+enum_test(Config) ->
+  run_schema_tests("enum", Config).
+
 items_test(Config) ->
   run_schema_tests("items", Config).
 
@@ -27,6 +30,10 @@ additionalItems_test(Config) ->
 properties_test(Config) ->
   run_schema_tests("properties", Config).
 
+% TODO just why?
+% extends_test(Config) ->
+%   run_schema_tests("extends", Config).
+
 additionalProperties_test(Config) ->
   run_schema_tests("additionalProperties", Config).
 
@@ -35,6 +42,9 @@ patternProperties_test(Config) ->
 
 type_test(Config) ->
   run_schema_tests("type", Config).
+
+pattern_test(Config) ->
+  run_schema_tests("pattern", Config).
 
 required_test(Config) ->
   run_schema_tests("required", Config).
@@ -59,3 +69,18 @@ maximum_test(Config) ->
 
 minimum_test(Config) ->
   run_schema_tests("minimum", Config).
+
+divisibleBy_test(Config) ->
+  run_schema_tests("divisibleBy", Config).
+
+default_test(Config) ->
+  run_schema_tests("default", Config).
+
+% dependencies_test(Config) ->
+%   run_schema_tests("dependencies", Config).
+
+% ref_test(Config) ->
+%   run_schema_tests("ref", Config).
+
+% refRemote_test(Config) ->
+%   run_schema_tests("refRemote", Config).

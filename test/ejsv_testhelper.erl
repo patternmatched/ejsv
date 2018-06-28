@@ -18,8 +18,9 @@ run_schema_test(TestSuite, Config) ->
   #{ <<"description">> := Description,
      <<"schema">> := Json,
      <<"tests">> := Tests } = TestSuite,
-  ct:pal("suite: ~s~nschema ~p", [Description, Json]),
+  ct:pal("SUITE: ~s~nSCHEMA: ~p", [Description, Json]),
   {ok, Schema} = ejsv_schema:compile(Json, SchemaOpts),
+  ct:pal("COMPILED: ~p~n", [Schema]),
   {ok, _} = ejsv_cache:set_schema(Description, Schema),
   lists:foreach(fun(Test) -> test_validation(Test, Description) end, Tests).
 
@@ -27,7 +28,7 @@ test_validation(TestCase, Ref) ->
   #{ <<"description">> := Description,
      <<"data">> := Data,
      <<"valid">> := Valid } = TestCase,
-  ct:pal("case: ~s~ndata: ~p~nvalid: ~p", [Description, Data, Valid]),
+  ct:pal("CASE: ~s~nDATA: ~p~nVALID: ~p", [Description, Data, Valid]),
   case Valid of
     true -> ?assertMatch(true, ejsv:validate(Ref, Data));
     false -> ?assertMatch({false, _}, ejsv:validate(Ref, Data))

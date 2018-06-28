@@ -18,23 +18,66 @@ init_per_testcase(_Case, Config) ->
   ok = ejsv_cache:install(),
   Config.
 
-% minItems_test(Config) ->
-%   run_schema_tests("minItems", Config).
+enum_test(Config) ->
+  run_schema_tests("enum", Config).
 
-% maxItems_test(Config) ->
-%   run_schema_tests("maxItems", Config).
+items_test(Config) ->
+  run_schema_tests("items", Config).
 
-% minLength_test(Config) ->
-%   run_schema_tests("minLength", Config).
+additionalItems_test(Config) ->
+  run_schema_tests("additionalItems", Config).
 
-% maxLength_test(Config) ->
-%   run_schema_tests("maxLength", Config).
+properties_test(Config) ->
+  run_schema_tests("properties", Config).
 
-% uniqueItems_test(Config) ->
-%   run_schema_tests("uniqueItems", Config).
+% TODO just why?
+% extends_test(Config) ->
+%   run_schema_tests("extends", Config).
 
-% maximum_test(Config) ->
-%   run_schema_tests("maximum", Config).
+additionalProperties_test(Config) ->
+  run_schema_tests("additionalProperties", Config).
+
+patternProperties_test(Config) ->
+  run_schema_tests("patternProperties", Config).
+
+type_test(Config) ->
+  run_schema_tests("type", Config).
+
+pattern_test(Config) ->
+  run_schema_tests("pattern", Config).
+
+required_test(Config) ->
+  run_schema_tests("required", Config).
+
+minItems_test(Config) ->
+  run_schema_tests("minItems", Config).
+
+maxItems_test(Config) ->
+  run_schema_tests("maxItems", Config).
+
+minLength_test(Config) ->
+  run_schema_tests("minLength", Config).
+
+maxLength_test(Config) ->
+  run_schema_tests("maxLength", Config).
+
+uniqueItems_test(Config) ->
+  run_schema_tests("uniqueItems", Config).
+
+maximum_test(Config) ->
+  run_schema_tests("maximum", Config).
 
 minimum_test(Config) ->
   run_schema_tests("minimum", Config).
+
+default_test(Config) ->
+  run_schema_tests("default", Config).
+
+% dependencies_test(Config) ->
+%   run_schema_tests("dependencies", Config).
+
+% ref_test(Config) ->
+%   run_schema_tests("ref", Config).
+
+% refRemote_test(Config) ->
+%   run_schema_tests("refRemote", Config).

@@ -6,6 +6,12 @@
 % if possible do work in keywords module
 % can break up a checks to take advantage of parallel execution
 
+enum(error) -> "value does not match enum".
+enum(V, #{ match := Enums }) ->
+  lists:member(V, Enums).
+
+%% --
+
 properties(V, _Opts) when not is_map(V) ->
   true;
 properties(V, #{ properties := PropSchemas }) ->
@@ -76,24 +82,21 @@ patterns_schema(V, #{ patterns := PatternSchemas }) ->
 items(error) -> "items failed validation".
 items(V, _Opts) when not is_list(V) ->
   true;
-items(V, #{ schema := ItemSchemas }) ->
-  Pairs = case is_list(ItemSchemas) of
-            true ->
-              lists:zip(lists:sublist(V, length(ItemSchemas)),
-                        ItemSchemas);
-            false ->
-              lists:zip(V, lists:duplicate(length(V), ItemSchemas))
-          end,
-  lists:all(fun({Item, Schema}) ->
-                check_schema(Item, Schema)
-            end, Pairs).
+items(V, #{ schema := ItemSchemas }) when is_list(ItemSchemas) ->
+  Split = min(length(V), length(ItemSchemas)),
+  Checks = [ check_schema(lists:nth(Idx, V), lists:nth(Idx, ItemSchemas))
+             || Idx <- lists:seq(1, Split) ],
+  lists:all(fun(B) -> B =:= true end, Checks);
+items(V, #{ schema := ItemSchema } = Opts) when is_record(ItemSchema, schema) ->
+  ItemSchemas = lists:duplicate(length(V), ItemSchema),
+  items(V, Opts#{ schema := ItemSchemas }).
 
 add_items(error) -> "additional items not allowed".
 add_items(V, _Opts) when not is_list(V) ->
   true;
 add_items(V, #{ item_count := Items, schema := Schema }) ->
   case is_record(Schema, schema) of
-    false -> length(V) =:= Items;
+    false -> length(V) =< Items;
     true ->
       Adds = lists:sublist(V, Items + 1, 10000),
       lists:all(fun(Item) ->
@@ -116,6 +119,12 @@ of_type(V, #{ type := Type }) ->
 one_of_type(error) -> "items failed validation".
 one_of_type(V, #{ types := Types }) ->
   lists:any(fun(Type) -> check_type(V, Type) end, Types).
+
+pattern(error) -> "string does not match pattern".
+pattern(V, _Opts) when not is_binary(V) ->
+  true;
+pattern(V, #{ regex := Pattern }) ->
+  check_match(V, Pattern).
 
 min_items(error) -> "number of items do not satisfy minimum".
 min_items(V, _Opts) when not is_list(V) ->
@@ -163,6 +172,13 @@ minimum(V, #{ minimum := Min, exclusive := Exclusive }) ->
     true -> V >= Min;
     false -> true
   end.
+
+div_by(error) -> "value is not divisible by factor".
+div_by(V, _Opts) when not is_number(V) ->
+  true;
+div_by(V, #{ factor := Factor }) ->
+  Div = V / Factor,
+  float(round(Div)) =:= Div.
 
 %% helpers
 

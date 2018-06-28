@@ -7,6 +7,7 @@
 
 for_schema({json_schema, {3,_}}) ->
   [
+   enum,
    prop_schemas,
    add_props,
    add_prop_schemas,
@@ -14,6 +15,28 @@ for_schema({json_schema, {3,_}}) ->
    item_schemas,
    add_items,
    type,
+   pattern,
+   required,
+   min_items,
+   max_items,
+   min_length,
+   max_length,
+   unique_items,
+   maximum,
+   minimum,
+   div_by
+  ];
+for_schema({json_schema, {4,_}}) ->
+  [
+   enum,
+   prop_schemas,
+   add_props,
+   add_prop_schemas,
+   pattern_prop_schemas,
+   item_schemas,
+   add_items,
+   type,
+   pattern,
    required,
    min_items,
    max_items,
@@ -22,17 +45,10 @@ for_schema({json_schema, {3,_}}) ->
    unique_items,
    maximum,
    minimum
-  ];
-for_schema({json_schema, {4,_}}) ->
-  [
-   min_items,
-   max_items,
-   min_length,
-   max_length,
-   unique_items,
-   maximum,
-   minimum
   ].
+
+define(_, enum, #{ <<"enum">> := Enums }) ->
+  {enum, #{ match => Enums }};
 
 define(_, item_schemas, #{ <<"items">> := [] }) ->
   [];
@@ -80,9 +96,15 @@ define(Version, type, #{ <<"type">> := Types }) when is_list(Types) ->
 define(_, type, #{ <<"type">> := Type })  ->
   {of_type, #{ type => Type }};
 
-define(_, required, #{ <<"properties">> := Props }) ->
+define(_, pattern, #{ <<"pattern">> := Pattern }) ->
+  {pattern, #{ regex => Pattern }};
+
+define({json_schema, {3,_}}, required, #{ <<"properties">> := Props }) ->
   Pred = fun(_K,V) -> maps:get(<<"required">>, V, false) end,
   Required = maps:keys(maps:filter(Pred,Props)),
+  {required, #{ required => Required }};
+
+define(_, required, #{ <<"required">> := Required }) ->
   {required, #{ required => Required }};
 
 define(_, min_items, #{ <<"minItems">> := Min }) ->
@@ -107,6 +129,9 @@ define(_, maximum, #{ <<"maximum">> := Max } = Schema)  ->
 define(_, minimum, #{ <<"minimum">> := Min } = Schema)  ->
   Exclusive = maps:get(<<"exclusiveMinimum">>, Schema, false),
   {minimum, #{ minimum => Min, exclusive => Exclusive }};
+
+define(_, div_by, #{ <<"divisibleBy">> := Factor })  ->
+  {div_by, #{ factor => Factor }};
 
 define(_Ver, _Keyword, _Schema) ->
   [].
