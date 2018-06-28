@@ -10,10 +10,12 @@ compile(JsonMap, Opts) when is_map(JsonMap) ->
   % probably in ejsv_jobs:process/2
   SchemaTag = {SchemaType, SchemaVersion},
   Rules = ejsv_rules:for_schema(SchemaTag),
+  Transform = ejsv_transform:for_schema(SchemaTag, JsonMap),
   ReduceRule = fun(Rule) -> reduce_rules(SchemaTag, JsonMap, Rule) end,
   SchemaRules = lists:concat(lists:map(ReduceRule, Rules)),
   {ok, #schema{ type = SchemaType,
                 version = SchemaVersion,
+                transform = Transform,
                 rules = SchemaRules }}.
 
 reduce_rules(Version, Schema, Rule) ->

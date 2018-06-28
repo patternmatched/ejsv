@@ -18,23 +18,23 @@ init_per_testcase(_Case, Config) ->
   ok = ejsv_cache:install(),
   Config.
 
-minItems_test(Config) ->
-  run_schema_tests("minItems", Config).
+% minItems_test(Config) ->
+%   run_schema_tests("minItems", Config).
 
-maxItems_test(Config) ->
-  run_schema_tests("maxItems", Config).
+% maxItems_test(Config) ->
+%   run_schema_tests("maxItems", Config).
 
-minLength_test(Config) ->
-  run_schema_tests("minLength", Config).
+% minLength_test(Config) ->
+%   run_schema_tests("minLength", Config).
 
-maxLength_test(Config) ->
-  run_schema_tests("maxLength", Config).
+% maxLength_test(Config) ->
+%   run_schema_tests("maxLength", Config).
 
-uniqueItems_test(Config) ->
-  run_schema_tests("uniqueItems", Config).
+% uniqueItems_test(Config) ->
+%   run_schema_tests("uniqueItems", Config).
 
-maximum_test(Config) ->
-  run_schema_tests("maximum", Config).
+% maximum_test(Config) ->
+%   run_schema_tests("maximum", Config).
 
 minimum_test(Config) ->
   run_schema_tests("minimum", Config).

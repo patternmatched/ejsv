@@ -36,3 +36,4 @@ true = ejsv:validate(SchemaFilename, JsonMap).
 
 Validate swagger spec itself using [Swagger Spec Test Suite](https://github.com/Yelp/swagger_spec_validator).
 Validate json schema rules using [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite.git).
+How everyone must be written [JSON Schema Validation Spec](https://tools.ietf.org/html/draft-handrews-json-schema-validation-01).

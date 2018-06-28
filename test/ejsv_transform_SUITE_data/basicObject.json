@@ -1,0 +1,18 @@
+[
+	{
+		"properties": {
+			"bool": { "type": "boolean" },
+			"string": { "type": "string" },
+			"date": { "type": "date" },
+			"datetime": { "type": "date-time" },
+			"integer": { "type": "integer" }
+		}
+	},
+	{
+		"bool": true,
+		"string": "value",
+		"date": "2017-01-01",
+		"datetime": "2017-01-01T10:10:11",
+		"integer": 12
+	}
+]

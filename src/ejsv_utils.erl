@@ -71,16 +71,38 @@ merge_lists(Parent,Child) ->
         end,
   lists:map(Fun,proplists:get_keys(Combined)).
 
-combine_lists(Parent,Child) ->
+combine_lists(Parent,Child) when is_list(Parent), is_list(Child) ->
   Combined = Parent ++ Child,
   Fun = fun(Key) ->
-            case proplists:get_all_values(Key,Combined) of
-              [L1, L2] when is_list(L1), is_list(L2) -> {Key,L1 ++ L2};
-              [L1, V2] when is_list(L1) -> {Key,L1 ++ [V2]};
-              [V1, L2] when is_list(L2) -> {Key,[V1|L2]};
-              [V1, V2] -> {Key, [V1, V2]};
-              [V] -> {Key, V};
-              Vs -> throw({additional_values_found, Key, Vs})
+            Values = proplists:get_all_values(Key,Combined),
+            case combine_values(Values) of
+              badarg -> throw({additional_values_found, Key, Values});
+              Value -> {Key, Value}
             end
         end,
   lists:map(Fun,proplists:get_keys(Combined)).
+
+combine_maps(Parent,Child) when is_map(Parent), is_map(Child) ->
+  Combined = maps:merge(Child, Parent),
+  Fun = fun(K,V1) ->
+            case maps:get(K, Child, nil) of
+              nil -> V1;
+              V2 -> combine_values([V1, V2])
+            end
+        end,
+  maps:map(Fun,Combined).
+
+combine_values(Values) ->
+  case Values of
+    [L1, L2] when is_list(L1), is_list(L2) -> L1 ++ L2;
+    [L1, V2] when is_list(L1) -> L1 ++ [V2];
+    [V1, L2] when is_list(L2) -> [V1|L2];
+    [V1, V2] -> [V1, V2];
+    [V] -> V;
+    Vs when length(Vs) > 2 -> badarg
+  end.
+
+maybe_binary_to_list(undefined) ->
+  undefined;
+maybe_binary_to_list(Bin) when is_binary(Bin) ->
+  binary_to_list(Bin).

@@ -6,27 +6,36 @@
 % if possible do work in rules
 % can break up a checks to take advantage of parallel execution
 
+-record(job, { errors = [],
+               data }).
+
 execute(_Json, #schema{ rules = [] }) ->
   true;
 execute(Json, Schema) when is_record(Schema, schema) ->
-  ct:pal("CT:VALIDATE ~p ~p~n", [Json, Schema#schema.rules]),
-  % TODO run checks in parallel
-  case lists:foldl(fun run_check/2, {Json, []}, Schema#schema.rules) of
-    {_, []} -> true;
-    {_, Errors} -> {false, Errors}
+  case
+    % TODO run jobs in parallel
+    lists:foldl(fun run_job/2,
+                #job{ data = Json },
+                Schema#schema.rules)
+  of
+    #job{ errors = [] } -> true;
+    #job{ errors = Errors } -> {false, Errors}
   end.
 
-run_check({Check, Opts}, {Json, Errors}) ->
-  Error = #{ rule => Check,
-             value => Json,
-             props => Opts },
-  Errs = case ?MODULE:Check(Json, Opts) of
-           true -> [];
-           false -> [Error#{ message => ?MODULE:Check(error) }];
-           {false, Msg} -> [Error#{ message => Msg }]
-         end,
-  ct:pal("CT:RUN_CHECK ~n~p ~n~p ~n~p -> ~n~p~n", [Check, Json, Opts, Errs]),
-  {Json, lists:append(Errs, Errors)}.
+run_job({Job, Opts}, #job{ data = Json } = St) ->
+  Detail = #{ rule => Job,
+              value => Json,
+              props => Opts },
+  case ?MODULE:Job(Json, Opts) of
+    true ->
+      St;
+    false ->
+      Error = Detail#{ message => ?MODULE:Job(error) },
+      St#job{ errors = [Error|St#job.errors] };
+    {false, Msg} ->
+      Error = Detail#{ message => Msg },
+      St#job{ errors = [Error|St#job.errors] }
+  end.
 
 %% --
 

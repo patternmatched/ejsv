@@ -1,0 +1,23 @@
+[
+	{
+		"type": "array",
+		"items": [
+			{ "type": "boolean" },
+			{ "type": "string" },
+			{ "type": "date" },
+			{ "type": "date-time" },
+			{ "type": "integer" }
+		],
+		"additionalItems": {
+			"type": "boolean"
+		}
+	},
+	[
+		true,
+		"value",
+		"2017-01-01",
+		"2017-01-01T10:10:11",
+		12,
+		false
+	]
+]

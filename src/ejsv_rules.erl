@@ -32,10 +32,6 @@ for_schema({json_schema, {4,_}}) ->
    unique_items,
    maximum,
    minimum
-  ];
-for_schema({open_api, _}) ->
-  [
-   properties
   ].
 
 rule(_, item_schemas, #{ <<"items">> := [] }) ->
