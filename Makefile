@@ -1,6 +1,6 @@
-all: compile
+all: build
 
-compile:
+build:
 	rebar3 compile
 
 clean:
@@ -9,4 +9,4 @@ clean:
 test:
 	rebar3 do ct --cover, cover
 
-.PHONY: all compile clean test
+.PHONY: all build clean test

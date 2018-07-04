@@ -1,2 +1,10 @@
-*.beam
 _build
+.rebar
+.eunit
+deps
+ebin
+*.o
+*.beam
+*.plt
+erl_crash.dump
+.DS_Store

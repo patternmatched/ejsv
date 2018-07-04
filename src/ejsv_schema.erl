@@ -11,6 +11,7 @@ compile(JsonMap, Opts) when is_map(JsonMap) ->
   SchemaTag = {SchemaType, SchemaVersion},
   Keywords = ejsv_keywords:for_schema(SchemaTag),
   Transform = ejsv_transform:for_schema(SchemaTag, JsonMap),
+  % TODO ResolvedSchema = ejsv_ref:resolve(JsonMap),
   ReduceKeyword = fun(Keyword) -> reduce_keywords(SchemaTag, JsonMap, Keyword) end,
   SchemaKeywords = lists:concat(lists:map(ReduceKeyword, Keywords)),
   {ok, #schema{ type = SchemaType,

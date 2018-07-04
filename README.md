@@ -2,6 +2,10 @@
 
 This library seeks to support all standards of schema validation on JSON objects.
 
+Simplicity and completeness first, performance next.
+
+Copyright 2018 www.patternmatched.com [MIT License][MIT]
+
 #### Supported schema versions
 
 - Json Schema v3
@@ -13,7 +17,7 @@ This library seeks to support all standards of schema validation on JSON objects
 - When invalid provide complete list of failures with context
 - Cache resolved schema definitions for performance
 - Assert in parallel where possible
-- Cant be built and tested with rebar, rebar3 and mix
+- Can be built and tested with rebar, rebar3 and mix
 
 # API
 
@@ -49,8 +53,11 @@ true = ejsv:transform(SchemaFilename, JsonMap, #{ validate => true }).
 
 ###### Next Steps
 
+- [ ] Rebuild schema cache mechanism to allow dereferencing of `$refs` **URGENT**
 - [ ] Expose errors from sub schema assertions
 - [ ] Run assertions on transformed data
+- [ ] Add build and test artifacts for rebar, rebar3 and mix as in [jsx](https://github.com/talentdeficit/jsx)
+- [ ] Test and add travis test status to readme
 - [ ] Complete validation for json schema v5 to v9
 - [ ] Add Open API schema validation v1.2 to v3.0
 - [ ] Add parelled excution of assertions
