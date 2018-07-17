@@ -17,7 +17,7 @@ transform(Ref, Json) ->
   transform(Ref, Json, #{}).
 
 transform(Ref, Json, Opts) ->
-  Validate = maps:key(validate, Opts),
+  Validate = maps:get(validate, Opts, false),
   % XXX literally the only reason we assert the json directly is
   % erlang cant distinguish strings from lists
   % otherwise its useful to be able to transform without asserting
