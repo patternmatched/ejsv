@@ -1,48 +1,66 @@
 -module(ejsv_testhelper).
--include_lib("common_test/include/ct.hrl").
 -include_lib("eunit/include/eunit.hrl").
 -compile(export_all).
 
-run_schema_tests(Rule, Config) ->
-  DataDir = proplists:get_value(data_dir, Config),
-  TestFile = filename:join([DataDir,Rule++".json"]),
-  {ok,Bin} = file:read_file(TestFile),
-  Tests = jiffy:decode(Bin, [return_maps]),
-  lists:foreach(fun(Test) -> run_schema_test(Test, Config) end, Tests).
-
-run_schema_test(TestSuite, Config) ->
-  _DefaultSchema = proplists:get_value(base_schema, Config),
-  SchemaType = proplists:get_value(schema, Config),
-  SchemaVersion = proplists:get_value(version, Config),
-  SchemaOpts = #{ schema => SchemaType, version => SchemaVersion },
-  #{ <<"description">> := Description,
-     <<"schema">> := Json,
-     <<"tests">> := Tests } = TestSuite,
-  ct:pal("SUITE: ~s~nSCHEMA: ~p", [Description, Json]),
-  {ok, Schema} = ejsv_schema:compile(Json, SchemaOpts),
-  ct:pal("COMPILED: ~p~n", [Schema]),
-  {ok, _} = ejsv_cache:set_schema(Description, Schema),
-  lists:foreach(fun(Test) -> test_validation(Test, Description) end, Tests).
-
-test_validation(TestCase, Ref) ->
-  #{ <<"description">> := Description,
-     <<"data">> := Data,
-     <<"valid">> := Valid } = TestCase,
-  ct:pal("CASE: ~s~nDATA: ~p~nVALID: ~p", [Description, Data, Valid]),
-  case Valid of
-    true -> ?assertMatch(true, ejsv:validate(Ref, Data));
-    false -> ?assertMatch({false, _}, ejsv:validate(Ref, Data))
-  end.
+fixture(FilePath) ->
+  {ok, Cwd} = file:get_cwd(),
+  Cwd ++ "/test/fixtures/" ++ FilePath.
 
 %% --
 
-all(Mod) ->
-  lists:filtermap(fun is_test/1, Mod:module_info(exports)).
+run_schema_tests(Opts, Keywords) ->
+  {setup,
+   fun () -> ok = ejsv_cache:install() end,
+   fun (_) -> ok = ejsv_cache:delete() end,
+   fun (_) ->
+       lists:map(fun(Keyword) ->
+                     run_schema_suites(Keyword, Opts)
+                 end, Keywords)
+   end}.
 
-is_test({Fun, Arity}) when is_atom(Fun) ->
-  is_test({Fun, lists:reverse(atom_to_list(Fun)), Arity});
-is_test({Fun, "tset_" ++ _, 1}) ->
-  {true, Fun};
-is_test(_) ->
-  false.
+run_schema_suites(Keyword, Opts) ->
+  TestDir = maps:get(test_dir, Opts),
+  SuiteFile = fixture(TestDir ++ atom_to_list(Keyword) ++ ".json"),
+  {ok,Bin} = file:read_file(SuiteFile),
+  Suites = jiffy:decode(Bin, [return_maps]),
+  {
+   atom_to_list(Keyword),
+   lists:map(fun(Suite) -> run_schema_suite(Suite, Opts) end, Suites)
+  }.
 
+run_schema_suite(Suite, Opts) ->
+  SchemaOpts = maps:with([schema, version], Opts),
+  #{ <<"description">> := Description,
+     <<"schema">> := Json,
+     <<"tests">> := Tests } = Suite,
+  {ok, Schema} = ejsv_schema:compile(Json, SchemaOpts),
+  {ok, _} = ejsv_cache:set_schema(Description, Schema),
+  {
+   Description,
+   lists:map(fun(Test) -> run_schema_test(Test, Description, Schema) end, Tests)
+  }.
+
+run_schema_test(Test, Ref, Schema) ->
+  #{ <<"description">> := Description,
+     <<"data">> := Data,
+     <<"valid">> := Valid } = Test,
+  {Description,
+   ?_test(begin
+            io:format("Data: ~p~nSchema: ~p", [Data, Schema]),
+            case Valid of
+              true -> ?assertMatch(true, ejsv:validate(Ref, Data));
+              false -> ?assertMatch({false, _}, ejsv:validate(Ref, Data))
+            end
+          end)}.
+
+%% --
+
+match_funs(Mod, Pattern) ->
+  lists:filtermap(
+    fun({Fun, Arity}) ->
+        case re:run(atom_to_list(Fun), Pattern) of
+          _ when Arity =/= 0 -> false;
+          {match,_} -> {true, fun Mod:Fun/0};
+          nomatch -> false
+        end
+    end, Mod:module_info(exports)).

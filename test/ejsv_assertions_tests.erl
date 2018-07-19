@@ -1,13 +1,10 @@
--module(ejsv_assertions_SUITE).
--include_lib("common_test/include/ct.hrl").
+-module(ejsv_assertions_tests).
 -include_lib("eunit/include/eunit.hrl").
 -compile(export_all).
 
 -define(mod, ejsv_assertions).
 
-all() -> ejsv_testhelper:all(?MODULE).
-
-maximum_test(_Config) ->
+maximum_test() ->
   Opts = #{ maximum => 3, exclusive => false },
   ?assert(?mod:maximum(1,Opts)),
   ?assert(?mod:maximum(3,Opts)),

@@ -1,17 +1,14 @@
--module(ejsv_SUITE).
--include_lib("common_test/include/ct.hrl").
+-module(ejsv_tests).
 -include_lib("eunit/include/eunit.hrl").
 -compile(export_all).
+-import(ejsv_testhelper, [ fixture/1 ]).
 
 -define(mod, ejsv).
 
-all() -> ejsv_testhelper:all(?MODULE).
-
-validate_test(Config) ->
-  DataDir = proplists:get_value(data_dir, Config),
-  SchemaFile = filename:join([DataDir,"schema.json"]),
-  ValidFile = filename:join([DataDir,"valid.json"]),
-  InvalidFile = filename:join([DataDir,"invalid.json"]),
+validate_test() ->
+  SchemaFile = fixture("schema.json"),
+  ValidFile = fixture("valid.json"),
+  InvalidFile = fixture("invalid.json"),
   Error = #{ keyword => maximum,
              value => 4,
              props => #{ maximum => 3, exclusive => false },

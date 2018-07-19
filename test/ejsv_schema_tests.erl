@@ -1,15 +1,21 @@
--module(ejsv_schema_SUITE).
--include_lib("common_test/include/ct.hrl").
+-module(ejsv_schema_tests).
 -include_lib("eunit/include/eunit.hrl").
 -include("ejsv.hrl").
+-import(ejsv_testhelper, [ match_funs/2 ]).
 -compile(export_all).
 
 -define(mod, ejsv_schema).
 
-all() -> ejsv_testhelper:all(?MODULE).
+meck_test_() ->
+  {setup,
+   fun() ->
+       ok = meck:new(ejsv_keywords),
+       ok = meck:new(ejsv_assertions, [non_strict])
+   end,
+   fun(_) -> meck:unload() end,
+   match_funs(?MODULE, "^test_")}.
 
-compile_test(_Config) ->
-  meck:new(ejsv_keywords),
+test_compile() ->
   meck:expect(ejsv_keywords, for_schema, 1, [rule]),
   Check = {check, #{}},
   Type = json_schema,
@@ -20,14 +26,12 @@ compile_test(_Config) ->
   ?assertMatch({ok, #schema{ keywords = [Check],
                              type = Type,
                              version = Version }},
-               ?mod:compile(Schema, Opts)),
-  meck:unload().
+               ?mod:compile(Schema, Opts)).
 
-assert_test(_Config) ->
+test_assert() ->
   Keyword = {existing_atom, #{}},
   Schema =  #schema{ keywords = [Keyword] },
   Valid = #{ <<"library">> => <<"eunit">> },
-  meck:new(ejsv_assertions, [non_strict]),
   meck:expect(ejsv_assertions, existing_atom, 2, true),
   ?assertEqual(true, ?mod:assert(Valid, Schema)),
   Invalid = #{ <<"library">> => <<"unkown_atom">> },
@@ -37,5 +41,4 @@ assert_test(_Config) ->
             props => #{},
             value => Invalid},
   meck:expect(ejsv_assertions, existing_atom, 2, {false,ErrorMsg}),
-  ?assertEqual({false, [Error]}, ?mod:assert(Invalid, Schema)),
-  meck:unload().
+  ?assertEqual({false, [Error]}, ?mod:assert(Invalid, Schema)).

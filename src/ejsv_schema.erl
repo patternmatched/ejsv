@@ -46,7 +46,6 @@ run_job({Keyword, Opts}, #job{ data = Json } = St) ->
   Detail = #{ keyword => Keyword,
               value => Json,
               props => Opts },
-  ct:pal("ASSERT: ~p ~p ~p~n", [Keyword, Json, Opts]),
   case ejsv_assertions:Keyword(Json, Opts) of
     true ->
       St;
