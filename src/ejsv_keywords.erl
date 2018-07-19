@@ -8,41 +8,42 @@
 for_schema({json_schema, {3,_}}) ->
   [
    enum,
-   prop_schemas,
+   properties,
+   % TODO these dont match, need to refactor how errors are generated
    add_props,
    add_prop_schemas,
-   pattern_prop_schemas,
-   item_schemas,
-   add_items,
+   patternProperties,
+   items,
+   additionalItems,
    type,
    pattern,
    required,
-   min_items,
-   max_items,
-   min_length,
-   max_length,
-   unique_items,
+   minItems,
+   maxItems,
+   minLength,
+   maxLength,
+   uniqueItems,
    maximum,
    minimum,
-   div_by
+   divisibleBy
   ];
 for_schema({json_schema, {4,_}}) ->
   [
    enum,
-   prop_schemas,
+   properties,
    add_props,
    add_prop_schemas,
-   pattern_prop_schemas,
-   item_schemas,
-   add_items,
+   patternProperties,
+   items,
+   additionalItems,
    type,
    pattern,
    required,
-   min_items,
-   max_items,
-   min_length,
-   max_length,
-   unique_items,
+   minItems,
+   maxItems,
+   minLength,
+   maxLength,
+   uniqueItems,
    maximum,
    minimum
   ].
@@ -50,15 +51,15 @@ for_schema({json_schema, {4,_}}) ->
 define(_, enum, #{ <<"enum">> := Enums }) ->
   {enum, #{ match => Enums }};
 
-define(_, item_schemas, #{ <<"items">> := [] }) ->
+define(_, items, #{ <<"items">> := [] }) ->
   [];
-define(Version, item_schemas, #{ <<"items">> := Items }) ->
+define(Version, items, #{ <<"items">> := Items }) ->
   {items, #{ schema => compile(Items, Version) }};
 
 %% XXX example of dynamic keywords
-define(_, add_items, #{ <<"additionalItems">> := true }) ->
+define(_, additionalItems, #{ <<"additionalItems">> := true }) ->
   [];
-define(Version, add_items, #{ <<"additionalItems">> := Adds } = Schema) ->
+define(Version, additionalItems, #{ <<"additionalItems">> := Adds } = Schema) ->
   case maps:get(<<"items">>, Schema, #{}) of
     Items when is_map(Items) -> [];
     Items when is_list(Items) ->
@@ -66,7 +67,7 @@ define(Version, add_items, #{ <<"additionalItems">> := Adds } = Schema) ->
                      schema => compile(Adds, Version) }}
   end;
 
-define(Version, prop_schemas, #{ <<"properties">> := Props }) ->
+define(Version, properties, #{ <<"properties">> := Props }) ->
   true = is_map(Props),
   PropSchemas = maps:map(fun(_Key, Prop) -> compile(Prop, Version) end, Props),
   {properties, #{ properties => PropSchemas }};
@@ -86,7 +87,7 @@ define(Version, add_prop_schemas, #{ <<"additionalProperties">> := Adds } = Sche
                    patterns => Patterns,
                    schema => AddSchema }};
 
-define(Version, pattern_prop_schemas, #{ <<"patternProperties">> := Patterns }) ->
+define(Version, patternProperties, #{ <<"patternProperties">> := Patterns }) ->
   true = is_map(Patterns),
   PatternSchemas = maps:map(fun(_Key, Prop) -> compile(Prop, Version) end, Patterns),
   {patterns_schema, #{ patterns => PatternSchemas }};
@@ -107,19 +108,19 @@ define({json_schema, {3,_}}, required, #{ <<"properties">> := Props }) ->
 define(_, required, #{ <<"required">> := Required }) ->
   {required, #{ required => Required }};
 
-define(_, min_items, #{ <<"minItems">> := Min }) ->
+define(_, minItems, #{ <<"minItems">> := Min }) ->
   {min_items, #{ min => Min }};
 
-define(_, max_items, #{ <<"maxItems">> := Max }) ->
+define(_, maxItems, #{ <<"maxItems">> := Max }) ->
   {max_items, #{ max => Max }};
 
-define(_, min_length, #{ <<"minLength">> := Min }) ->
+define(_, minLength, #{ <<"minLength">> := Min }) ->
   {min_length, #{ min => Min }};
 
-define(_, max_length, #{ <<"maxLength">> := Max }) ->
+define(_, maxLength, #{ <<"maxLength">> := Max }) ->
   {max_length, #{ max => Max }};
 
-define(_, unique_items, #{ <<"uniqueItems">> := true }) ->
+define(_, uniqueItems, #{ <<"uniqueItems">> := true }) ->
   {unique_items, #{}};
 
 define(_, maximum, #{ <<"maximum">> := Max } = Schema)  ->
@@ -130,7 +131,7 @@ define(_, minimum, #{ <<"minimum">> := Min } = Schema)  ->
   Exclusive = maps:get(<<"exclusiveMinimum">>, Schema, false),
   {minimum, #{ minimum => Min, exclusive => Exclusive }};
 
-define(_, div_by, #{ <<"divisibleBy">> := Factor })  ->
+define(_, divisibleBy, #{ <<"divisibleBy">> := Factor })  ->
   {div_by, #{ factor => Factor }};
 
 define(_Ver, _Keyword, _Schema) ->
