@@ -22,3 +22,20 @@ compile_test(_Config) ->
                              version = Version }},
                ?mod:compile(Schema, Opts)),
   meck:unload().
+
+assert_test(_Config) ->
+  Keyword = {existing_atom, #{}},
+  Schema =  #schema{ keywords = [Keyword] },
+  Valid = #{ <<"library">> => <<"eunit">> },
+  meck:new(ejsv_assertions, [non_strict]),
+  meck:expect(ejsv_assertions, existing_atom, 2, true),
+  ?assertEqual(true, ?mod:assert(Valid, Schema)),
+  Invalid = #{ <<"library">> => <<"unkown_atom">> },
+  ErrorMsg = "atom does not exist",
+  Error = #{keyword => existing_atom,
+            message => ErrorMsg,
+            props => #{},
+            value => Invalid},
+  meck:expect(ejsv_assertions, existing_atom, 2, {false,ErrorMsg}),
+  ?assertEqual({false, [Error]}, ?mod:assert(Invalid, Schema)),
+  meck:unload().

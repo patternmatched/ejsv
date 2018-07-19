@@ -1,7 +1,7 @@
 -module(ejsv_cache).
 -include("ejsv.hrl").
 
--export([ install/0, clear/0 ]).
+-export([ install/0, delete/0, clear/0 ]).
 -export([ get_schema/1, set_schema/2 ]).
 
 install() ->
@@ -9,6 +9,9 @@ install() ->
            {keypos, #schema.id},
            {read_concurrency, true} ],
   ?MODULE = ets:new(?MODULE,Opts), ok.
+
+delete() ->
+  true = ets:delete(?MODULE), ok.
 
 clear() ->
   true = ets:delete_all_objects(?MODULE), ok.

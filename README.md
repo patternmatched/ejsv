@@ -4,7 +4,7 @@ This library seeks to support all standards of schema validation on JSON objects
 
 Simplicity and completeness first, performance next.
 
-Copyright 2018 www.patternmatched.com [MIT License][MIT]
+Copyright 2018 www.patternmatched.com Apache 2.0
 
 #### Supported schema versions
 
@@ -17,6 +17,7 @@ Copyright 2018 www.patternmatched.com [MIT License][MIT]
 - When invalid provide complete list of failures with context
 - Cache resolved schema definitions for performance
 - Assert in parallel where possible
+- Provide complete context on errors
 - Can be built and tested with rebar, rebar3 and mix
 
 # API
@@ -38,6 +39,7 @@ Copyright 2018 www.patternmatched.com [MIT License][MIT]
 
 -spec ejsv:transform(ref :: schema_ref(), JSON :: ejsv_opts()) ->
   true |
+  map() |
   {error, list(ejsv_error())}.
 ```
 
@@ -69,3 +71,4 @@ true = ejsv:transform(SchemaFilename, JsonMap, #{ validate => true }).
 - [JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite.git) - validate json schema logic
 - [JSON Schema Validation Spec](https://tools.ietf.org/html/draft-handrews-json-schema-validation-01) - guide project design to best describe spec
 - [Swagger Spec Test Suite](https://github.com/Yelp/swagger_spec_validator) - validate swagger spec itself
+- [Validation Error Spec](https://github.com/epoberezkin/ajv/tree/v6.5.2#validation-errors)
