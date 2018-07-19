@@ -6,6 +6,11 @@
 % this only gets done at compile time
 
 for_schema({json_schema, {3,_}}) ->
+  for_schema({json_schema, {4,0}}) ++
+  [
+   divisibleBy
+  ];
+for_schema({json_schema, {4,_}}) ->
   [
    enum,
    properties,
@@ -24,29 +29,10 @@ for_schema({json_schema, {3,_}}) ->
    maxLength,
    uniqueItems,
    maximum,
-   minimum,
-   divisibleBy
-  ];
-for_schema({json_schema, {4,_}}) ->
-  [
-   enum,
-   properties,
-   add_props,
-   add_prop_schemas,
-   patternProperties,
-   items,
-   additionalItems,
-   type,
-   pattern,
-   required,
-   minItems,
-   maxItems,
-   minLength,
-   maxLength,
-   uniqueItems,
-   maximum,
    minimum
-  ].
+  ];
+for_schema({json_schema, {7,_}}) ->
+  for_schema({json_schema, {4,0}}).
 
 define(_, enum, #{ <<"enum">> := Enums }) ->
   {enum, #{ match => Enums }};
