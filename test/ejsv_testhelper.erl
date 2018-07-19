@@ -1,6 +1,5 @@
 -module(ejsv_testhelper).
--include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
+-include_lib("stdlib/include/assert.hrl").
 -compile(export_all).
 
 run_schema_tests(Rule, Config) ->

@@ -1,6 +1,5 @@
 -module(ejsv_SUITE).
--include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
+-include_lib("stdlib/include/assert.hrl").
 -compile(export_all).
 
 -define(mod, ejsv).

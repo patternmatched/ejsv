@@ -1,12 +1,14 @@
 -module(ejsv_schema_SUITE).
--include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
+-include_lib("stdlib/include/assert.hrl").
 -include("ejsv.hrl").
 -compile(export_all).
 
 -define(mod, ejsv_schema).
 
 all() -> ejsv_testhelper:all(?MODULE).
+
+end_per_testcase(_Config) ->
+  meck:unload().
 
 compile_test(_Config) ->
   meck:new(ejsv_keywords),
@@ -20,8 +22,7 @@ compile_test(_Config) ->
   ?assertMatch({ok, #schema{ keywords = [Check],
                              type = Type,
                              version = Version }},
-               ?mod:compile(Schema, Opts)),
-  meck:unload().
+               ?mod:compile(Schema, Opts)).
 
 assert_test(_Config) ->
   Keyword = {existing_atom, #{}},
@@ -37,5 +38,4 @@ assert_test(_Config) ->
             props => #{},
             value => Invalid},
   meck:expect(ejsv_assertions, existing_atom, 2, {false,ErrorMsg}),
-  ?assertEqual({false, [Error]}, ?mod:assert(Invalid, Schema)),
-  meck:unload().
+  ?assertEqual({false, [Error]}, ?mod:assert(Invalid, Schema)).

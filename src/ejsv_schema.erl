@@ -43,18 +43,25 @@ assert(Data, #schema{ keywords = Keywords }) ->
   end.
 
 run_job({Keyword, Opts}, #job{ data = Json } = St) ->
-  Detail = #{ keyword => Keyword,
-              value => Json,
-              props => Opts },
-  ct:pal("ASSERT: ~p ~p ~p~n", [Keyword, Json, Opts]),
   case ejsv_assertions:Keyword(Json, Opts) of
     true ->
       St;
     false ->
-      Error = Detail#{ message => ejsv_assertions:Keyword(error) },
+      Msg = ejsv_assertions:Keyword(error),
+      Error = #{ keyword => Keyword,
+                 message => Msg,
+                 value => Json,
+                 props => Opts },
       St#job{ errors = [Error|St#job.errors] };
-    {false, Msg} ->
-      Error = Detail#{ message => Msg },
+    {false, Msg} when is_integer(hd(Msg)) ->
+      Error = #{ keyword => Keyword,
+                 message => Msg,
+                 value => Json,
+                 props => Opts },
+      St#job{ errors = [Error|St#job.errors] };
+    {false, Errors} when is_map(hd(Errors)) ->
+      Error = #{ keyword => Keyword,
+                 causes => Errors },
       St#job{ errors = [Error|St#job.errors] }
   end.
 

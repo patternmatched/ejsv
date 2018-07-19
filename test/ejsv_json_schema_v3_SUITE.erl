@@ -1,6 +1,5 @@
 -module(ejsv_json_schema_v3_SUITE).
--include_lib("common_test/include/ct.hrl").
--include_lib("eunit/include/eunit.hrl").
+-include_lib("stdlib/include/assert.hrl").
 -compile(export_all).
 
 -import(ejsv_testhelper, [ run_schema_tests/2 ]).
