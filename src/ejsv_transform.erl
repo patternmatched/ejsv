@@ -86,6 +86,12 @@ transform(Value, #value{ type = string, format = "date-time" }) ->
   catch
     _:_ -> Value
   end;
+transform(Value, #value{ type = string, format = "atom" }) ->
+  try
+    binary_to_existing_atom(Value, unicode)
+  catch
+    _:_ -> Value
+  end;
 transform(Value, #value{ type = string }) ->
   try
     binary_to_list(Value)
