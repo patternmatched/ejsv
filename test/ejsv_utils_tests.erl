@@ -1,13 +1,10 @@
--module(ejsv_utils_SUITE).
--include_lib("common_test/include/ct.hrl").
+-module(ejsv_utils_tests).
 -include_lib("eunit/include/eunit.hrl").
 -compile(export_all).
 
 -define(mod, ejsv_utils).
 
-all() -> ejsv_testhelper:all(?MODULE).
-
-merge_lists_test(_Config)->
+merge_lists_test()->
   ?assertEqual([{test, override},
                 {only_parent, true},
                 {only_child, true}],
@@ -16,7 +13,7 @@ merge_lists_test(_Config)->
                   [{test, overridden}, {only_child, true}]
                  )).
 
-combine_lists_test(_Config)->
+combine_lists_test()->
   ?assertEqual([{lists_concat, [1,2]}],
                ?mod:combine_lists(
                   [{lists_concat, [1]}],
@@ -48,7 +45,7 @@ combine_lists_test(_Config)->
                   [{value, 3}]
                  )).
 
-combine_maps_test(_Config)->
+combine_maps_test()->
   ?assertEqual(#{ maps_concat => [1,2] },
                ?mod:combine_maps(
                   #{ maps_concat => [1] },
