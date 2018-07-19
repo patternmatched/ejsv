@@ -1,10 +1,13 @@
 -record(keyword, { name,
-                   assertion,
+                   path,
+                   function,
+                   options,
                    params,
-                   path }).
+                   schema,
+                   data,
+                   errors = [] }).
 
 -record(schema, { id,
                   keywords,
                   transform,
-                  type,
                   version }).

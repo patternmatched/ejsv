@@ -10,8 +10,7 @@ all() -> ejsv_testhelper:all(?MODULE).
 
 init_per_suite(Config) ->
   [ {base_schema, "http://json-schema.org/draft-03/schema#"},
-    {schema, json_schema},
-    {version, {3,0}} | Config ].
+    {schema, {json_schema, {3,0}}} | Config ].
 
 init_per_testcase(_Case, Config) ->
   ok = ejsv_cache:install(),

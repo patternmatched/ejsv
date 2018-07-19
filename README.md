@@ -34,8 +34,7 @@ Copyright 2018 www.patternmatched.com Apache 2.0
 
 -type ejsv_opts() ::
   #{ validate => boolean(),
-     schema => json_schema,
-     version => {integer(), integer()} }.
+     schema => {json_schema, {integer(), integer()}} }.
 
 -spec ejsv:transform(ref :: schema_ref(), JSON :: ejsv_opts()) ->
   true |
@@ -46,7 +45,7 @@ Copyright 2018 www.patternmatched.com Apache 2.0
 #### Usage
 
 ```erlang
-SchemaFilename = "./user-schema.json",
+SchemaFilename = "user-schema.json",
 JsonMap = #{ field => "value" },
 true = ejsv:transform(SchemaFilename, JsonMap, #{ validate => true }).
 ```

@@ -11,9 +11,8 @@ run_schema_tests(Rule, Config) ->
 
 run_schema_test(TestSuite, Config) ->
   _DefaultSchema = proplists:get_value(base_schema, Config),
-  SchemaType = proplists:get_value(schema, Config),
-  SchemaVersion = proplists:get_value(version, Config),
-  SchemaOpts = #{ schema => SchemaType, version => SchemaVersion },
+  SchemaVersion = proplists:get_value(schema, Config),
+  SchemaOpts = #{ schema => SchemaVersion },
   #{ <<"description">> := Description,
      <<"schema">> := Json,
      <<"tests">> := Tests } = TestSuite,

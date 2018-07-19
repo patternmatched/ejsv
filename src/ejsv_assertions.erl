@@ -180,6 +180,11 @@ div_by(V, #{ factor := Factor }) ->
   Div = V / Factor,
   float(round(Div)) =:= Div.
 
+one_of(error) -> "value does not match oneOf schema".
+one_of(V, #{ schemas := Schemas }) when is_list(Schemas) ->
+  {Pass, _Fail} = lists:partition(fun(Schema) -> check_schema(V, Schema) end, Schemas),
+  length(Pass) =:= 1.
+
 %% helpers
 
 check_match(Str, Pattern) ->
@@ -204,8 +209,9 @@ check_type(_V, <<"any">>)    -> true;
 check_type(V, #schema{} = S) -> check_schema(V, S);
 check_type(_V, _Type)        -> false.
 
-check_schema(V, Schema) ->
+check_schema(V, Schema) when is_record(Schema, schema) ->
   case ejsv_schema:assert(V, Schema) of
     true -> true;
     {false,_} -> false
-  end.
+  end;
+check_schema(_V, Bool) when is_boolean(Bool) -> Bool.

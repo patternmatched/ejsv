@@ -10,8 +10,7 @@ all() -> ejsv_testhelper:all(?MODULE).
 
 init_per_suite(Config) ->
   [ {base_schema, "http://json-schema.org/draft-07/schema#"},
-    {schema, json_schema},
-    {version, {7,0}} | Config ].
+    {schema, {json_schema, {7,0}}} | Config ].
 
 init_per_testcase(_Case, Config) ->
   ok = ejsv_cache:install(),
@@ -80,3 +79,6 @@ default_test(Config) ->
 
 % refRemote_test(Config) ->
 %   run_schema_tests("refRemote", Config).
+
+oneOf_test(Config) ->
+  run_schema_tests("oneOf", Config).
