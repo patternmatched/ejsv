@@ -45,3 +45,32 @@ assert_test(_Config) ->
             value => Invalid},
   meck:expect(ejsv_assertions, existing_atom, 2, {false,ErrorMsg}),
   ?assertEqual({false, [Error]}, ?mod:assert(Invalid, Schema)).
+
+error_format_test(Config) ->
+  DataDir = proplists:get_value(data_dir, Config),
+  SchemaFile = filename:join([DataDir,"complex.json"]),
+  Opts = #{ schema => {json_schema, {7,0}} },
+  {ok, SchemaJson} = ejsv_utils:json_file(SchemaFile),
+  {ok, Schema} = ejsv_schema:compile(SchemaJson, Opts),
+  Test = fun(Errors, Data) ->
+             Result = ejsv_schema:assert(Data, Schema),
+             ?assertEqual({false, Errors}, Result)
+         end,
+  % Test([#{ schemaPath => "#/properties/name",
+  %          dataPath => "#/name",
+  %          message => "property type not valid" }],
+  %      #{ <<"name">> => 10 }).
+  Test([#{causes => [#{keyword => "type",
+                       message => "items failed validation",
+                       params => #{type => <<"string">>},
+                       value => 10}],
+          keyword => "properties"}],
+       #{ <<"name">> => 10 }).
+
+% TODO in principle we json transcodable errors
+% error_transcodable_test(Config) ->
+%   ErrorsJson = #{},
+%   {false, Errors} = ejsv_schema:assert(Data, Schema),
+%   ErrorsJsonified = jiffy:decode(jiffy:encode(Errors), [return_maps]),
+%   ?assertEqual(ErrorsJson, ErrorsJsonified).
+%   ok.

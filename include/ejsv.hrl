@@ -1,3 +1,8 @@
+-record(p, { pointer,
+             abstract,
+             value,
+             data }).
+
 -record(keyword, { name,
                    path,
                    function,

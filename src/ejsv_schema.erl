@@ -1,6 +1,5 @@
 -module(ejsv_schema).
 -include("ejsv.hrl").
-
 -export([ compile/2, transform/2, assert/2 ]).
 
 compile(SchemaJson, Opts) when is_map(SchemaJson) ->

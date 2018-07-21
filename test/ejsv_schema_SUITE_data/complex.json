@@ -1,0 +1,6 @@
+{
+	"type": ["object", "integer"],
+	"properties": {
+		"name": { "type": "string" }
+	}
+}

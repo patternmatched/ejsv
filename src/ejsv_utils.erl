@@ -58,6 +58,12 @@ lists_search(Condition, [E | Rest]) ->
   end;
 lists_search(_Cond, []) -> false.
 
+lists_join(_Sep, []) -> [];
+lists_join(Sep, [H|T]) -> [H|join_prepend(Sep, T)].
+
+join_prepend(_Sep, []) -> [];
+join_prepend(Sep, [H|T]) -> [Sep,H|join_prepend(Sep,T)].
+
 remove_dups([]) ->
   [];
 remove_dups([H|T]) ->
